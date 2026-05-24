@@ -1977,134 +1977,138 @@ Write-Host @"
 
 "@
 Write-Host "$BLUE================================$NC"
-Write-Host "$GREEN🚀   Cursor 防掉试用Pro删除工具          $NC"
-Write-Host "$YELLOW📱  关注公众号【煎饼果子卷AI】 $NC"
-Write-Host "$YELLOW🤝  一起交流更多Cursor技巧和AI知识(脚本免费、关注公众号加群有更多技巧和大佬)  $NC"
-Write-Host "$YELLOW💡  [重要提示] 本工具免费，如果对您有帮助，请关注公众号【煎饼果子卷AI】  $NC"
-Write-Host ""
-Write-Host "$YELLOW⚡  [小小广告] Cursor官网正规成品号：Unlimited ♾️ ¥1050 | 7天周卡 $100 ¥210 | 7天周卡 $500 ¥1050 | 7天周卡 $1000 ¥2450 | 全部7天质保 | ，WeChat：JavaRookie666  $NC"
+Write-Host "$GREEN   Công cụ xóa trial Pro Cursor chống tụt trial          $NC"
 Write-Host "$BLUE================================$NC"
 
-# 🎯 用户选择菜单
+# 🎯 Menu chọn chế độ
 Write-Host ""
-Write-Host "$GREEN🎯 [选择模式]$NC 请选择您要执行的操作："
+Write-Host "$GREEN🎯 [Chọn chế độ]$NC Hãy chọn thao tác muốn thực hiện:"
 Write-Host ""
-Write-Host "$BLUE  1️⃣  仅修改机器码$NC"
-Write-Host "$YELLOW      • 执行机器码修改功能$NC"
-Write-Host "$YELLOW      • 执行注入破解JS代码到核心文件$NC"
-Write-Host "$YELLOW      • 跳过文件夹删除/环境重置步骤$NC"
-Write-Host "$YELLOW      • 保留现有Cursor配置和数据$NC"
+Write-Host "$BLUE  1️⃣  Chỉ sửa machine ID (Không xóa cài đặt cursor) $NC"
+Write-Host "$YELLOW      • Chỉ thực hiện sửa machine ID$NC"
+Write-Host "$YELLOW      • Tiêm mã JS patch vào file core$NC"
+Write-Host "$YELLOW      • Bỏ qua bước xóa folder/reset môi trường$NC"
+Write-Host "$YELLOW      • Giữ nguyên config và dữ liệu Cursor hiện tại$NC"
 Write-Host ""
-Write-Host "$BLUE  2️⃣  重置环境+修改机器码$NC"
-Write-Host "$RED      • 执行完全环境重置（删除Cursor文件夹）$NC"
-Write-Host "$RED      • ⚠️  配置将丢失，请注意备份$NC"
-Write-Host "$YELLOW      • 按照机器代码修改$NC"
-Write-Host "$YELLOW      • 执行注入破解JS代码到核心文件$NC"
-Write-Host "$YELLOW      • 这相当于当前的完整脚本行为$NC"
+Write-Host "$BLUE  2️⃣  Reset cài đặt cursor + sửa machine ID$NC"
+Write-Host "$RED      • Reset hoàn toàn môi trường (sẽ giống như tải lần đầu)$NC"
+Write-Host "$RED      • ⚠️  Toàn bộ config sẽ mất, nhớ backup$NC"
+Write-Host "$YELLOW      • Sau đó sửa machine ID$NC"
+Write-Host "$YELLOW      • Tiêm mã JS patch vào file core$NC"
+Write-Host "$YELLOW      • Đây là chế độ chạy full script như mặc định$NC"
 Write-Host ""
 
-# 获取用户选择
+# Lấy lựa chọn người dùng
 do {
-    $userChoice = Read-Host "请输入选择 (1 或 2)"
+    $userChoice = Read-Host "Chọn (1 hoặc 2)"
     if ($userChoice -eq "1") {
-        Write-Host "$GREEN✅ [选择]$NC 您选择了：仅修改机器码"
+        Write-Host "$GREEN✅ [Đã chọn]$NC Bạn chọn: Chỉ sửa machine ID"
         $executeMode = "MODIFY_ONLY"
         break
     } elseif ($userChoice -eq "2") {
-        Write-Host "$GREEN✅ [选择]$NC 您选择了：重置环境+修改机器码"
-        Write-Host "$RED⚠️  [重要警告]$NC 此操作将删除所有Cursor配置文件！"
-        $confirmReset = Read-Host "确认执行完全重置？(输入 yes 确认，其他任意键取消)"
+        Write-Host "$GREEN✅ [Đã chọn]$NC Bạn chọn: Reset cài đặt cursor + sửa machine ID"
+        Write-Host "$RED⚠️  [CẢNH BÁO QUAN TRỌNG]$NC Thao tác này sẽ xóa toàn bộ config Cursor!"
+        $confirmReset = Read-Host "Xác nhận reset hoàn toàn? (nhập chữ yes để xác nhận, nhập đại cái khác để hủy)"
         if ($confirmReset -eq "yes") {
             $executeMode = "RESET_AND_MODIFY"
             break
         } else {
-            Write-Host "$YELLOW👋 [取消]$NC 用户取消重置操作"
+            Write-Host "$YELLOW👋 [Đã hủy]$NC Người dùng đã hủy thao tác reset"
             continue
         }
     } else {
-        Write-Host "$RED❌ [错误]$NC 无效选择，请输入 1 或 2"
+        Write-Host "$RED❌ [Lỗi]$NC Lựa chọn không hợp lệ, hãy nhập 1 hoặc 2"
     }
 } while ($true)
 
 Write-Host ""
 
-# 📋 根据选择显示执行流程说明
+# 📋 Hiển thị quy trình thực thi theo lựa chọn
 if ($executeMode -eq "MODIFY_ONLY") {
-    Write-Host "$GREEN📋 [执行流程]$NC 仅修改机器码模式将按以下步骤执行："
-    Write-Host "$BLUE  1️⃣  检测Cursor配置文件$NC"
-    Write-Host "$BLUE  2️⃣  备份现有配置文件$NC"
-    Write-Host "$BLUE  3️⃣  修改机器码配置$NC"
-    Write-Host "$BLUE  4️⃣  显示操作完成信息$NC"
+    Write-Host "$GREEN📋 [Quy trình thực thi]$NC Chế độ chỉ sửa machine ID sẽ làm các bước sau:"
+    Write-Host "$BLUE  1️⃣  Kiểm tra file config Cursor$NC"
+    Write-Host "$BLUE  2️⃣  Backup file config hiện tại$NC"
+    Write-Host "$BLUE  3️⃣  Sửa machine ID$NC"
+    Write-Host "$BLUE  4️⃣  Hiển thị thông báo hoàn tất$NC"
     Write-Host ""
-    Write-Host "$YELLOW⚠️  [注意事项]$NC"
-    Write-Host "$YELLOW  • 不会删除任何文件夹或重置环境$NC"
-    Write-Host "$YELLOW  • 保留所有现有配置和数据$NC"
-    Write-Host "$YELLOW  • 原配置文件会自动备份$NC"
+    Write-Host "$YELLOW⚠️  [Lưu ý]$NC"
+    Write-Host "$YELLOW  • Không xóa bất kỳ thư mục hay reset môi trường nào$NC"
+    Write-Host "$YELLOW  • Giữ nguyên toàn bộ config và dữ liệu hiện có$NC"
+    Write-Host "$YELLOW  • File config cũ sẽ được backup tự động$NC"
 } else {
-    Write-Host "$GREEN📋 [执行流程]$NC 重置环境+修改机器码模式将按以下步骤执行："
-    Write-Host "$BLUE  1️⃣  检测并关闭Cursor进程$NC"
-    Write-Host "$BLUE  2️⃣  保存Cursor程序路径信息$NC"
-    Write-Host "$BLUE  3️⃣  删除指定的Cursor试用相关文件夹$NC"
+    Write-Host "$GREEN📋 [Quy trình thực thi]$NC Chế độ reset môi trường + sửa machine ID sẽ làm các bước sau:"
+    Write-Host "$BLUE  1️⃣  Kiểm tra và tắt tiến trình Cursor$NC"
+    Write-Host "$BLUE  2️⃣  Lưu thông tin đường dẫn cài đặt Cursor$NC"
+    Write-Host "$BLUE  3️⃣  Xóa các thư mục liên quan tới trial Cursor$NC"
     Write-Host "$BLUE      📁 C:\Users\Administrator\.cursor$NC"
     Write-Host "$BLUE      📁 C:\Users\Administrator\AppData\Roaming\Cursor$NC"
     Write-Host "$BLUE      📁 C:\Users\%USERNAME%\.cursor$NC"
     Write-Host "$BLUE      📁 C:\Users\%USERNAME%\AppData\Roaming\Cursor$NC"
-    Write-Host "$BLUE  3.5️⃣ 预创建必要目录结构，避免权限问题$NC"
-    Write-Host "$BLUE  4️⃣  重新启动Cursor让其生成新的配置文件$NC"
-    Write-Host "$BLUE  5️⃣  等待配置文件生成完成（最多45秒）$NC"
-    Write-Host "$BLUE  6️⃣  关闭Cursor进程$NC"
-    Write-Host "$BLUE  7️⃣  修改新生成的机器码配置文件$NC"
-    Write-Host "$BLUE  8️⃣  显示操作完成统计信息$NC"
+    Write-Host "$BLUE  3.5️⃣ Tạo trước cấu trúc thư mục cần thiết để tránh lỗi quyền$NC"
+    Write-Host "$BLUE  4️⃣  Khởi động lại Cursor để tạo config mới$NC"
+    Write-Host "$BLUE  5️⃣  Chờ config được tạo xong (tối đa 45 giây)$NC"
+    Write-Host "$BLUE  6️⃣  Tắt tiến trình Cursor$NC"
+    Write-Host "$BLUE  7️⃣  Sửa machine ID mới được tạo$NC"
+    Write-Host "$BLUE  8️⃣  Hiển thị thống kê hoàn tất$NC"
     Write-Host ""
-    Write-Host "$YELLOW⚠️  [注意事项]$NC"
-    Write-Host "$YELLOW  • 脚本执行过程中请勿手动操作Cursor$NC"
-    Write-Host "$YELLOW  • 建议在执行前关闭所有Cursor窗口$NC"
-    Write-Host "$YELLOW  • 执行完成后需要重新启动Cursor$NC"
-    Write-Host "$YELLOW  • 原配置文件会自动备份到backups文件夹$NC"
+    Write-Host "$YELLOW⚠️  [Lưu ý]$NC"
+    Write-Host "$YELLOW  • Trong lúc script chạy đừng đụng vào Cursor$NC"
+    Write-Host "$YELLOW  • Nên đóng toàn bộ cửa sổ Cursor trước khi chạy$NC"
+    Write-Host "$YELLOW  • Sau khi hoàn tất cần mở lại Cursor$NC"
+    Write-Host "$YELLOW  • File config cũ sẽ tự backup vào thư mục backups$NC"
 }
 Write-Host ""
 
-# 🤔 用户确认
-Write-Host "$GREEN🤔 [确认]$NC 请确认您已了解上述执行流程"
-$confirmation = Read-Host "是否继续执行？(输入 y 或 yes 继续，其他任意键退出)"
+# 🤔 Xác nhận người dùng
+Write-Host "$GREEN🤔 [Xác nhận]$NC Hãy chắc chắn bạn đã hiểu quy trình bên trên"
+$confirmation = Read-Host "Tiếp tục thực thi? (nhập y hoặc yes để tiếp tục, nhập khác để thoát)"
 if ($confirmation -notmatch "^(y|yes)$") {
-    Write-Host "$YELLOW👋 [退出]$NC 用户取消执行，脚本退出"
-    Read-Host "按回车键退出"
+    Write-Host "$YELLOW👋 [Thoát]$NC Người dùng đã hủy thực thi, script thoát"
+    Read-Host "Nhấn Enter để thoát"
     exit 0
 }
-Write-Host "$GREEN✅ [确认]$NC 用户确认继续执行"
+Write-Host "$GREEN✅ [Xác nhận]$NC Người dùng xác nhận tiếp tục"
 Write-Host ""
 
 # 获取并显示 Cursor 版本
 function Get-CursorVersion {
     try {
-        # 主要检测路径（基于安装路径解析）
+        # Đường dẫn kiểm tra chính (phân tích từ thư mục cài đặt)
         $installPath = Resolve-CursorInstallPath
         $packagePath = if ($installPath) { Join-Path $installPath "resources\app\package.json" } else { $null }
+
         if ($packagePath -and (Test-Path $packagePath)) {
             $packageJson = Get-Content $packagePath -Raw | ConvertFrom-Json
+
             if ($packageJson.version) {
-                Write-Host "$GREEN[信息]$NC 当前安装的 Cursor 版本: v$($packageJson.version)"
+                Write-Host "$GREEN[Thông tin]$NC Phiên bản Cursor hiện tại: v$($packageJson.version)"
                 return $packageJson.version
             }
         }
 
-        # 备用路径检测（兼容旧目录结构）
-        $altPath = if ($global:CursorLocalAppDataRoot) { Join-Path $global:CursorLocalAppDataRoot "cursor\resources\app\package.json" } else { $null }
+        # Đường dẫn kiểm tra phụ (tương thích cấu trúc thư mục cũ)
+        $altPath = if ($global:CursorLocalAppDataRoot) {
+            Join-Path $global:CursorLocalAppDataRoot "cursor\resources\app\package.json"
+        } else {
+            $null
+        }
+
         if ($altPath -and (Test-Path $altPath)) {
             $packageJson = Get-Content $altPath -Raw | ConvertFrom-Json
+
             if ($packageJson.version) {
-                Write-Host "$GREEN[信息]$NC 当前安装的 Cursor 版本: v$($packageJson.version)"
+                Write-Host "$GREEN[Thông tin]$NC Phiên bản Cursor hiện tại: v$($packageJson.version)"
                 return $packageJson.version
             }
         }
 
-        Write-Host "$YELLOW[警告]$NC 无法检测到 Cursor 版本"
-        Write-Host "$YELLOW[提示]$NC 请确保 Cursor 已正确安装"
+        Write-Host "$YELLOW[Cảnh báo]$NC Không thể phát hiện phiên bản Cursor"
+        Write-Host "$YELLOW[Gợi ý]$NC Hãy đảm bảo Cursor đã được cài đúng cách"
+
         return $null
     }
     catch {
-        Write-Host "$RED[错误]$NC 获取 Cursor 版本失败: $_"
+        Write-Host "$RED[Lỗi]$NC Không thể lấy phiên bản Cursor: $_"
         return $null
     }
 }
@@ -2113,94 +2117,137 @@ function Get-CursorVersion {
 $cursorVersion = Get-CursorVersion
 Write-Host ""
 
-Write-Host "$YELLOW💡 [重要提示]$NC 最新的 1.0.x 版本已支持"
+Write-Host "$YELLOW💡 [Lưu ý quan trọng]$NC Đã hỗ trợ các phiên bản mới nhất dòng 1.0.x"
 
 Write-Host ""
 
-# 🔍 检查并关闭 Cursor 进程
-Write-Host "$GREEN🔍 [检查]$NC 正在检查 Cursor 进程..."
+# 🔍 Kiểm tra và tắt tiến trình Cursor
+Write-Host "$GREEN🔍 [Kiểm tra]$NC Đang kiểm tra tiến trình Cursor..."
 
 function Get-ProcessDetails {
     param($processName)
-    Write-Host "$BLUE🔍 [调试]$NC 正在获取 $processName 进程详细信息："
+
+    Write-Host "$BLUE🔍 [Debug]$NC Đang lấy thông tin chi tiết tiến trình $processName :"
+
     Get-WmiObject Win32_Process -Filter "name='$processName'" |
         Select-Object ProcessId, ExecutablePath, CommandLine |
         Format-List
 }
 
-# 定义最大重试次数和等待时间
+# Số lần thử lại tối đa và thời gian chờ
 $MAX_RETRIES = 5
 $WAIT_TIME = 1
 
-# 🔄 处理进程关闭并保存进程信息
+# 🔄 Đóng tiến trình và lưu thông tin tiến trình
 function Close-CursorProcessAndSaveInfo {
     param($processName)
 
     $global:CursorProcessInfo = $null
 
     $processes = Get-Process -Name $processName -ErrorAction SilentlyContinue
-    if ($processes) {
-        Write-Host "$YELLOW⚠️  [警告]$NC 发现 $processName 正在运行"
 
-        # 💾 保存进程信息用于后续重启 - 修复：确保获取单个进程路径
-        $firstProcess = if ($processes -is [array]) { $processes[0] } else { $processes }
+    if ($processes) {
+
+        Write-Host "$YELLOW⚠️  [Cảnh báo]$NC Phát hiện $processName đang chạy"
+
+        # 💾 Lưu thông tin tiến trình để khởi động lại sau
+        # sửa lỗi: đảm bảo chỉ lấy một đường dẫn tiến trình
+        $firstProcess = if ($processes -is [array]) {
+            $processes[0]
+        } else {
+            $processes
+        }
+
         $processPath = $firstProcess.Path
 
-        # 确保路径是字符串而不是数组
+        # Đảm bảo path là string chứ không phải mảng
         if ($processPath -is [array]) {
             $processPath = $processPath[0]
         }
 
         $global:CursorProcessInfo = @{
             ProcessName = $firstProcess.ProcessName
-            Path = $processPath
-            StartTime = $firstProcess.StartTime
+            Path        = $processPath
+            StartTime   = $firstProcess.StartTime
         }
-        Write-Host "$GREEN💾 [保存]$NC 已保存进程信息: $($global:CursorProcessInfo.Path)"
+
+        Write-Host "$GREEN💾 [Lưu]$NC Đã lưu thông tin tiến trình: $($global:CursorProcessInfo.Path)"
 
         Get-ProcessDetails $processName
 
-        Write-Host "$YELLOW🔄 [操作]$NC 尝试关闭 $processName..."
+        Write-Host "$YELLOW🔄 [Thao tác]$NC Đang thử tắt $processName..."
         Stop-Process -Name $processName -Force
 
         $retryCount = 0
+
         while ($retryCount -lt $MAX_RETRIES) {
+
             $process = Get-Process -Name $processName -ErrorAction SilentlyContinue
-            if (-not $process) { break }
+
+            if (-not $process) {
+                break
+            }
 
             $retryCount++
+
             if ($retryCount -ge $MAX_RETRIES) {
-                Write-Host "$RED❌ [错误]$NC 在 $MAX_RETRIES 次尝试后仍无法关闭 $processName"
+
+                Write-Host "$RED❌ [Lỗi]$NC Không thể tắt $processName sau $MAX_RETRIES lần thử"
+
                 Get-ProcessDetails $processName
-                Write-Host "$RED💥 [错误]$NC 请手动关闭进程后重试"
-                Read-Host "按回车键退出"
+
+                Write-Host "$RED💥 [Lỗi]$NC Hãy tự tắt tiến trình rồi chạy lại"
+
+                Read-Host "Nhấn Enter để thoát"
+
                 exit 1
             }
-            Write-Host "$YELLOW⏳ [等待]$NC 等待进程关闭，尝试 $retryCount/$MAX_RETRIES..."
+
+            Write-Host "$YELLOW⏳ [Chờ]$NC Đang chờ tiến trình tắt... thử lần $retryCount/$MAX_RETRIES"
+
             Start-Sleep -Seconds $WAIT_TIME
         }
-        Write-Host "$GREEN✅ [成功]$NC $processName 已成功关闭"
+
+        Write-Host "$GREEN✅ [Thành công]$NC Đã tắt $processName thành công"
+
     } else {
-        Write-Host "$BLUE💡 [提示]$NC 未发现 $processName 进程运行"
-        # 尝试找到Cursor的安装路径
+
+        Write-Host "$BLUE💡 [Gợi ý]$NC Không phát hiện tiến trình $processName đang chạy"
+
+        # Thử tìm đường dẫn cài đặt Cursor
         $installPath = Resolve-CursorInstallPath
-        $candidatePath = if ($installPath) { Join-Path $installPath "Cursor.exe" } else { $null }
+
+        $candidatePath = if ($installPath) {
+            Join-Path $installPath "Cursor.exe"
+        } else {
+            $null
+        }
+
         if ($candidatePath -and (Test-Path $candidatePath)) {
+
             $global:CursorProcessInfo = @{
                 ProcessName = "Cursor"
-                Path = $candidatePath
-                StartTime = $null
+                Path        = $candidatePath
+                StartTime   = $null
             }
-            Write-Host "$GREEN💾 [发现]$NC 找到Cursor安装路径: $candidatePath"
+
+            Write-Host "$GREEN💾 [Phát hiện]$NC Đã tìm thấy đường dẫn cài đặt Cursor: $candidatePath"
         }
 
         if (-not $global:CursorProcessInfo) {
-            Write-Host "$YELLOW⚠️  [警告]$NC 未找到Cursor安装路径，将使用默认路径"
-            $defaultInstallPath = if ($global:CursorLocalAppDataRoot) { Join-Path $global:CursorLocalAppDataRoot "Programs\cursor\Cursor.exe" } else { "$env:LOCALAPPDATA\Programs\cursor\Cursor.exe" }
+
+            Write-Host "$YELLOW⚠️  [Cảnh báo]$NC Không tìm thấy đường dẫn Cursor, sẽ dùng đường dẫn mặc định"
+
+            $defaultInstallPath = if ($global:CursorLocalAppDataRoot) {
+                Join-Path $global:CursorLocalAppDataRoot "Programs\cursor\Cursor.exe"
+            } else {
+                "$env:LOCALAPPDATA\Programs\cursor\Cursor.exe"
+            }
+
             $global:CursorProcessInfo = @{
                 ProcessName = "Cursor"
-                Path = $defaultInstallPath
-                StartTime = $null
+                Path        = $defaultInstallPath
+                StartTime   = $null
             }
         }
     }
@@ -2208,296 +2255,330 @@ function Close-CursorProcessAndSaveInfo {
 
 # �️ 确保备份目录存在
 if (-not $BACKUP_DIR) {
-    Write-Host "$YELLOW⚠️  [警告]$NC 无法解析备份目录路径，跳过创建"
+    Write-Host "$YELLOW⚠️  [Cảnh báo]$NC Không thể phân tích đường dẫn thư mục backup, bỏ qua tạo thư mục"
+
 } elseif (-not (Test-Path $BACKUP_DIR)) {
+
     try {
+
         New-Item -ItemType Directory -Path $BACKUP_DIR -Force | Out-Null
-        Write-Host "$GREEN✅ [备份目录]$NC 备份目录创建成功: $BACKUP_DIR"
+
+        Write-Host "$GREEN✅ [Backup]$NC Tạo thư mục backup thành công: $BACKUP_DIR"
+
     } catch {
-        Write-Host "$YELLOW⚠️  [警告]$NC 备份目录创建失败: $($_.Exception.Message)"
+
+        Write-Host "$YELLOW⚠️  [Cảnh báo]$NC Tạo thư mục backup thất bại: $($_.Exception.Message)"
     }
 }
 
-# �🚀 根据用户选择执行相应功能
+# 🚀 Thực thi chức năng theo lựa chọn người dùng
 if ($executeMode -eq "MODIFY_ONLY") {
-    Write-Host "$GREEN🚀 [开始]$NC 开始执行仅修改机器码功能..."
 
-    # 先进行环境检查
+    Write-Host "$GREEN🚀 [Bắt đầu]$NC Đang chạy chế độ chỉ sửa machine code..."
+
+    # Kiểm tra môi trường trước
     $envCheck = Test-CursorEnvironment -Mode "MODIFY_ONLY"
+
     if (-not $envCheck.Success) {
+
         Write-Host ""
-        Write-Host "$RED❌ [环境检查失败]$NC 无法继续执行，发现以下问题："
+        Write-Host "$RED❌ [Kiểm tra môi trường thất bại]$NC Không thể tiếp tục, phát hiện các vấn đề sau:"
+
         foreach ($issue in $envCheck.Issues) {
             Write-Host "$RED  • ${issue}$NC"
         }
+
         Write-Host ""
-        Write-Host "$YELLOW💡 [建议]$NC 请选择以下操作："
-        Write-Host "$BLUE  1️⃣  选择'重置环境+修改机器码'选项（推荐）$NC"
-        Write-Host "$BLUE  2️⃣  手动启动Cursor一次，然后重新运行脚本$NC"
-        Write-Host "$BLUE  3️⃣  检查Cursor是否正确安装$NC"
+        Write-Host "$YELLOW💡 [Gợi ý]$NC Hãy chọn một trong các cách sau:"
+        Write-Host "$BLUE  1️⃣  Chọn chế độ 'Reset môi trường + sửa machine code' (khuyên dùng)$NC"
+        Write-Host "$BLUE  2️⃣  Mở Cursor thủ công một lần rồi chạy lại script$NC"
+        Write-Host "$BLUE  3️⃣  Kiểm tra Cursor đã được cài đúng chưa$NC"
         Write-Host ""
-        Read-Host "按回车键退出"
+
+        Read-Host "Nhấn Enter để thoát"
         exit 1
     }
 
-    # 执行机器码修改
+    # Thực thi sửa machine code
     $configSuccess = Modify-MachineCodeConfig -Mode "MODIFY_ONLY"
 
     if ($configSuccess) {
-        Write-Host ""
-        Write-Host "$GREEN🎉 [配置文件]$NC 机器码配置文件修改完成！"
 
-        # 添加注册表修改
-        Write-Host "$BLUE🔧 [注册表]$NC 正在修改系统注册表..."
+        Write-Host ""
+        Write-Host "$GREEN🎉 [Config]$NC Sửa file machine code thành công!"
+
+        # Sửa registry
+        Write-Host "$BLUE🔧 [Registry]$NC Đang chỉnh sửa registry hệ thống..."
         $registrySuccess = Update-MachineGuid
 
-        # 🔧 新增：JavaScript注入功能（设备识别绕过增强）
+        # JavaScript inject
         Write-Host ""
-        Write-Host "$BLUE🔧 [设备识别绕过]$NC 正在执行JavaScript注入功能..."
-        Write-Host "$BLUE💡 [说明]$NC 此功能将直接修改Cursor内核JS文件，实现更深层的设备识别绕过"
+        Write-Host "$BLUE🔧 [Bypass nhận diện thiết bị]$NC Đang thực thi inject JavaScript..."
+        Write-Host "$BLUE💡 [Mô tả]$NC Chức năng này sẽ sửa trực tiếp file JS lõi của Cursor để bypass nhận diện thiết bị sâu hơn"
+
         $jsSuccess = Modify-CursorJSFiles
 
         if ($registrySuccess) {
-            Write-Host "$GREEN✅ [注册表]$NC 系统注册表修改成功"
+
+            Write-Host "$GREEN✅ [Registry]$NC Sửa registry thành công"
 
             if ($jsSuccess) {
-                Write-Host "$GREEN✅ [JavaScript注入]$NC JavaScript注入功能执行成功"
+
+                Write-Host "$GREEN✅ [JavaScript Inject]$NC Inject JavaScript thành công"
+
                 Write-Host ""
-                Write-Host "$GREEN🎉 [完成]$NC 所有机器码修改完成（增强版）！"
-                Write-Host "$BLUE📋 [详情]$NC 已完成以下修改："
-                Write-Host "$GREEN  ✓ Cursor 配置文件 (storage.json)$NC"
-                Write-Host "$GREEN  ✓ 系统注册表 (MachineGuid)$NC"
-                Write-Host "$GREEN  ✓ JavaScript内核注入（设备识别绕过）$NC"
+                Write-Host "$GREEN🎉 [Hoàn tất]$NC Toàn bộ machine code đã được sửa (bản nâng cao)!"
+
+                Write-Host "$BLUE📋 [Chi tiết]$NC Đã hoàn thành:"
+                Write-Host "$GREEN  ✓ File config Cursor (storage.json)$NC"
+                Write-Host "$GREEN  ✓ Registry hệ thống (MachineGuid)$NC"
+                Write-Host "$GREEN  ✓ Inject JS lõi (bypass nhận diện thiết bị)$NC"
+
             } else {
-                Write-Host "$YELLOW⚠️  [JavaScript注入]$NC JavaScript注入功能执行失败，但其他功能成功"
+
+                Write-Host "$YELLOW⚠️  [JavaScript Inject]$NC Inject JS thất bại nhưng các chức năng khác vẫn thành công"
+
                 Write-Host ""
-                Write-Host "$GREEN🎉 [完成]$NC 所有机器码修改完成！"
-                Write-Host "$BLUE📋 [详情]$NC 已完成以下修改："
-                Write-Host "$GREEN  ✓ Cursor 配置文件 (storage.json)$NC"
-                Write-Host "$GREEN  ✓ 系统注册表 (MachineGuid)$NC"
-                Write-Host "$YELLOW  ⚠ JavaScript内核注入（部分失败）$NC"
+                Write-Host "$GREEN🎉 [Hoàn tất]$NC Đã sửa machine code xong!"
+
+                Write-Host "$BLUE📋 [Chi tiết]$NC Đã hoàn thành:"
+                Write-Host "$GREEN  ✓ File config Cursor (storage.json)$NC"
+                Write-Host "$GREEN  ✓ Registry hệ thống (MachineGuid)$NC"
+                Write-Host "$YELLOW  ⚠ Inject JS lõi (thất bại một phần)$NC"
             }
 
-            # 🔒 添加配置文件保护机制
-            Write-Host "$BLUE🔒 [保护]$NC 正在设置配置文件保护..."
+            # Bảo vệ file config
+            Write-Host "$BLUE🔒 [Bảo vệ]$NC Đang bật bảo vệ file config..."
+
             try {
+
                 $configPath = $STORAGE_FILE
+
                 if (-not $configPath) {
-                    throw "无法解析配置文件路径"
+                    throw "Không thể phân tích đường dẫn file config"
                 }
+
                 $configFile = Get-Item $configPath
                 $configFile.IsReadOnly = $true
-                Write-Host "$GREEN✅ [保护]$NC 配置文件已设置为只读，防止Cursor覆盖修改"
-                Write-Host "$BLUE💡 [提示]$NC 文件路径: $configPath"
+
+                Write-Host "$GREEN✅ [Bảo vệ]$NC File config đã được đặt thành chỉ đọc để tránh Cursor ghi đè"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Đường dẫn file: $configPath"
+
             } catch {
-                Write-Host "$YELLOW⚠️  [保护]$NC 设置只读属性失败: $($_.Exception.Message)"
-                Write-Host "$BLUE💡 [建议]$NC 可手动右键文件 → 属性 → 勾选'只读'"
+
+                Write-Host "$YELLOW⚠️  [Bảo vệ]$NC Không thể đặt thuộc tính chỉ đọc: $($_.Exception.Message)"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Có thể tự làm thủ công: chuột phải file → Properties → tick 'Read-only'"
             }
+
         } else {
-            Write-Host "$YELLOW⚠️  [注册表]$NC 注册表修改失败，但配置文件修改成功"
+
+            Write-Host "$YELLOW⚠️  [Registry]$NC Sửa registry thất bại nhưng file config đã sửa thành công"
 
             if ($jsSuccess) {
-                Write-Host "$GREEN✅ [JavaScript注入]$NC JavaScript注入功能执行成功"
+
+                Write-Host "$GREEN✅ [JavaScript Inject]$NC Inject JS thành công"
+
                 Write-Host ""
-                Write-Host "$YELLOW🎉 [部分完成]$NC 配置文件和JavaScript注入完成，注册表修改失败"
-                Write-Host "$BLUE💡 [建议]$NC 可能需要管理员权限来修改注册表"
-                Write-Host "$BLUE📋 [详情]$NC 已完成以下修改："
-                Write-Host "$GREEN  ✓ Cursor 配置文件 (storage.json)$NC"
-                Write-Host "$YELLOW  ⚠ 系统注册表 (MachineGuid) - 失败$NC"
-                Write-Host "$GREEN  ✓ JavaScript内核注入（设备识别绕过）$NC"
+                Write-Host "$YELLOW🎉 [Hoàn thành một phần]$NC Config và JS inject đã xong nhưng registry lỗi"
+
+                Write-Host "$BLUE💡 [Gợi ý]$NC Có thể cần chạy bằng quyền Administrator"
+
+                Write-Host "$BLUE📋 [Chi tiết]$NC Đã hoàn thành:"
+                Write-Host "$GREEN  ✓ File config Cursor (storage.json)$NC"
+                Write-Host "$YELLOW  ⚠ Registry hệ thống (MachineGuid) - lỗi$NC"
+                Write-Host "$GREEN  ✓ Inject JS lõi (bypass nhận diện thiết bị)$NC"
+
             } else {
-                Write-Host "$YELLOW⚠️  [JavaScript注入]$NC JavaScript注入功能执行失败"
+
+                Write-Host "$YELLOW⚠️  [JavaScript Inject]$NC Inject JS thất bại"
+
                 Write-Host ""
-                Write-Host "$YELLOW🎉 [部分完成]$NC 配置文件修改完成，注册表和JavaScript注入失败"
-                Write-Host "$BLUE💡 [建议]$NC 可能需要管理员权限来修改注册表"
+                Write-Host "$YELLOW🎉 [Hoàn thành một phần]$NC Chỉ sửa config thành công, registry và JS inject thất bại"
+
+                Write-Host "$BLUE💡 [Gợi ý]$NC Có thể cần quyền Administrator"
             }
 
-            # 🔒 即使注册表修改失败，也要保护配置文件
-            Write-Host "$BLUE🔒 [保护]$NC 正在设置配置文件保护..."
+            # Dù registry lỗi vẫn bảo vệ file
+            Write-Host "$BLUE🔒 [Bảo vệ]$NC Đang bật bảo vệ file config..."
+
             try {
+
                 $configPath = $STORAGE_FILE
+
                 if (-not $configPath) {
-                    throw "无法解析配置文件路径"
+                    throw "Không thể phân tích đường dẫn file config"
                 }
+
                 $configFile = Get-Item $configPath
                 $configFile.IsReadOnly = $true
-                Write-Host "$GREEN✅ [保护]$NC 配置文件已设置为只读，防止Cursor覆盖修改"
-                Write-Host "$BLUE💡 [提示]$NC 文件路径: $configPath"
+
+                Write-Host "$GREEN✅ [Bảo vệ]$NC File config đã được đặt chỉ đọc"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Đường dẫn file: $configPath"
+
             } catch {
-                Write-Host "$YELLOW⚠️  [保护]$NC 设置只读属性失败: $($_.Exception.Message)"
-                Write-Host "$BLUE💡 [建议]$NC 可手动右键文件 → 属性 → 勾选'只读'"
+
+                Write-Host "$YELLOW⚠️  [Bảo vệ]$NC Không thể bật read-only: $($_.Exception.Message)"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Tự bật bằng tay trong Properties"
             }
         }
 
         Write-Host ""
-        Write-Host "$BLUE🚫 [禁用更新]$NC 正在禁用 Cursor 自动更新..."
+        Write-Host "$BLUE🚫 [Tắt cập nhật]$NC Đang vô hiệu hóa auto update của Cursor..."
+
         if (Disable-CursorAutoUpdate) {
-            Write-Host "$GREEN✅ [禁用更新]$NC 自动更新已处理"
+
+            Write-Host "$GREEN✅ [Tắt cập nhật]$NC Đã xử lý auto update"
+
         } else {
-            Write-Host "$YELLOW⚠️  [禁用更新]$NC 未能确认禁用更新，可能需要手动处理"
+
+            Write-Host "$YELLOW⚠️  [Tắt cập nhật]$NC Không thể xác nhận đã tắt update, có thể cần xử lý tay"
         }
 
-        Write-Host "$BLUE💡 [提示]$NC 现在可以启动Cursor使用新的机器码配置"
-    } else {
-        Write-Host ""
-        Write-Host "$RED❌ [失败]$NC 机器码修改失败！"
-        Write-Host "$YELLOW💡 [建议]$NC 请尝试'重置环境+修改机器码'选项"
-    }
-} else {
-    # 完整的重置环境+修改机器码流程
-    Write-Host "$GREEN🚀 [开始]$NC 开始执行重置环境+修改机器码功能..."
+        Write-Host "$BLUE💡 [Gợi ý]$NC Giờ có thể mở Cursor bằng machine code mới"
 
-    # 🚀 关闭所有 Cursor 进程并保存信息
+    } else {
+
+        Write-Host ""
+        Write-Host "$RED❌ [Thất bại]$NC Sửa machine code thất bại!"
+        Write-Host "$YELLOW💡 [Gợi ý]$NC Hãy thử chế độ 'Reset môi trường + sửa machine code'"
+    }
+
+} else {
+
+    # Quy trình đầy đủ reset + sửa machine code
+    Write-Host "$GREEN🚀 [Bắt đầu]$NC Đang chạy chế độ reset môi trường + sửa machine code..."
+
+    # Tắt toàn bộ Cursor
     Close-CursorProcessAndSaveInfo "Cursor"
+
     if (-not $global:CursorProcessInfo) {
         Close-CursorProcessAndSaveInfo "cursor"
     }
 
-    # 🚨 重要警告提示
+    # Cảnh báo quan trọng
     Write-Host ""
-    Write-Host "$RED🚨 [重要警告]$NC ============================================"
-    Write-Host "$YELLOW⚠️  [风控提醒]$NC Cursor 风控机制非常严格！"
-    Write-Host "$YELLOW⚠️  [必须删除]$NC 必须完全删除指定文件夹，不能有任何残留设置"
-    Write-Host "$YELLOW⚠️  [防掉试用]$NC 只有彻底清理才能有效防止掉试用Pro状态"
-    Write-Host "$RED🚨 [重要警告]$NC ============================================"
+    Write-Host "$RED🚨 [Cảnh báo quan trọng]$NC ============================================"
+    Write-Host "$YELLOW⚠️  [Nhắc nhở]$NC Cơ chế anti abuse của Cursor rất gắt!"
+    Write-Host "$YELLOW⚠️  [Bắt buộc xoá]$NC Phải xoá sạch toàn bộ thư mục liên quan"
+    Write-Host "$YELLOW⚠️  [Chống mất trial]$NC Chỉ dọn sạch hoàn toàn mới hạn chế mất Pro trial"
+    Write-Host "$RED🚨 [Cảnh báo quan trọng]$NC ============================================"
     Write-Host ""
 
-    # 🎯 执行 Cursor 防掉试用Pro删除文件夹功能
-    Write-Host "$GREEN🚀 [开始]$NC 开始执行核心功能..."
+    # Xóa thư mục trial
+    Write-Host "$GREEN🚀 [Bắt đầu]$NC Đang thực thi chức năng chính..."
     Remove-CursorTrialFolders
 
-
-
-    # 🔄 重启Cursor让其重新生成配置文件
+    # Restart Cursor
     Restart-CursorAndWait
 
-    # 🛠️ 修改机器码配置
+    # Sửa machine code
     $configSuccess = Modify-MachineCodeConfig
-    
-    # 🧹 执行 Cursor 初始化清理
+
+    # Cleanup khởi tạo
     Invoke-CursorInitialization
 
     if ($configSuccess) {
         Write-Host ""
-        Write-Host "$GREEN🎉 [配置文件]$NC 机器码配置文件修改完成！"
-
-        # 添加注册表修改
-        Write-Host "$BLUE🔧 [注册表]$NC 正在修改系统注册表..."
+        Write-Host "$GREEN🎉 [Tệp cấu hình]$NC Đã sửa mã máy thành công!"
+    
+        # Thêm chỉnh sửa registry
+        Write-Host "$BLUE🔧 [Registry]$NC Đang chỉnh sửa registry hệ thống..."
         $registrySuccess = Update-MachineGuid
-
-        # 🔧 新增：JavaScript注入功能（设备识别绕过增强）
+    
+        # 🔧 Thêm chức năng inject JavaScript (tăng cường bypass nhận diện thiết bị)
         Write-Host ""
-        Write-Host "$BLUE🔧 [设备识别绕过]$NC 正在执行JavaScript注入功能..."
-        Write-Host "$BLUE💡 [说明]$NC 此功能将直接修改Cursor内核JS文件，实现更深层的设备识别绕过"
+        Write-Host "$BLUE🔧 [Bypass nhận diện thiết bị]$NC Đang thực thi chức năng inject JavaScript..."
+        Write-Host "$BLUE💡 [Mô tả]$NC Chức năng này sẽ chỉnh sửa trực tiếp file JS lõi của Cursor để bypass nhận diện thiết bị ở mức sâu hơn"
         $jsSuccess = Modify-CursorJSFiles
-
+    
         if ($registrySuccess) {
-            Write-Host "$GREEN✅ [注册表]$NC 系统注册表修改成功"
-
+            Write-Host "$GREEN✅ [Registry]$NC Đã chỉnh sửa registry hệ thống thành công"
+    
             if ($jsSuccess) {
-                Write-Host "$GREEN✅ [JavaScript注入]$NC JavaScript注入功能执行成功"
+                Write-Host "$GREEN✅ [Inject JavaScript]$NC Inject JavaScript thành công"
                 Write-Host ""
-                Write-Host "$GREEN🎉 [完成]$NC 所有操作完成（增强版）！"
-                Write-Host "$BLUE📋 [详情]$NC 已完成以下操作："
-                Write-Host "$GREEN  ✓ 删除 Cursor 试用相关文件夹$NC"
-                Write-Host "$GREEN  ✓ Cursor 初始化清理$NC"
-                Write-Host "$GREEN  ✓ 重新生成配置文件$NC"
-                Write-Host "$GREEN  ✓ 修改机器码配置$NC"
-                Write-Host "$GREEN  ✓ 修改系统注册表$NC"
-                Write-Host "$GREEN  ✓ JavaScript内核注入（设备识别绕过）$NC"
+                Write-Host "$GREEN🎉 [Hoàn tất]$NC Đã hoàn thành toàn bộ thao tác sửa mã máy (bản nâng cao)!"
+                Write-Host "$BLUE📋 [Chi tiết]$NC Đã thực hiện các thay đổi sau:"
+                Write-Host "$GREEN  ✓ File cấu hình Cursor (storage.json)$NC"
+                Write-Host "$GREEN  ✓ Registry hệ thống (MachineGuid)$NC"
+                Write-Host "$GREEN  ✓ Inject JS lõi (bypass nhận diện thiết bị)$NC"
             } else {
-                Write-Host "$YELLOW⚠️  [JavaScript注入]$NC JavaScript注入功能执行失败，但其他功能成功"
+                Write-Host "$YELLOW⚠️  [Inject JavaScript]$NC Inject JavaScript thất bại, nhưng các chức năng khác vẫn thành công"
                 Write-Host ""
-                Write-Host "$GREEN🎉 [完成]$NC 所有操作完成！"
-                Write-Host "$BLUE📋 [详情]$NC 已完成以下操作："
-                Write-Host "$GREEN  ✓ 删除 Cursor 试用相关文件夹$NC"
-                Write-Host "$GREEN  ✓ Cursor 初始化清理$NC"
-                Write-Host "$GREEN  ✓ 重新生成配置文件$NC"
-                Write-Host "$GREEN  ✓ 修改机器码配置$NC"
-                Write-Host "$GREEN  ✓ 修改系统注册表$NC"
-                Write-Host "$YELLOW  ⚠ JavaScript内核注入（部分失败）$NC"
+                Write-Host "$GREEN🎉 [Hoàn tất]$NC Đã hoàn thành sửa mã máy!"
+                Write-Host "$BLUE📋 [Chi tiết]$NC Đã thực hiện các thay đổi sau:"
+                Write-Host "$GREEN  ✓ File cấu hình Cursor (storage.json)$NC"
+                Write-Host "$GREEN  ✓ Registry hệ thống (MachineGuid)$NC"
+                Write-Host "$YELLOW  ⚠ Inject JS lõi (thất bại một phần)$NC"
             }
-
-            # 🔒 添加配置文件保护机制
-            Write-Host "$BLUE🔒 [保护]$NC 正在设置配置文件保护..."
+    
+            # 🔒 Thêm cơ chế bảo vệ file cấu hình
+            Write-Host "$BLUE🔒 [Bảo vệ]$NC Đang thiết lập bảo vệ file cấu hình..."
             try {
                 $configPath = $STORAGE_FILE
                 if (-not $configPath) {
-                    throw "无法解析配置文件路径"
+                    throw "Không thể phân tích đường dẫn file cấu hình"
                 }
                 $configFile = Get-Item $configPath
                 $configFile.IsReadOnly = $true
-                Write-Host "$GREEN✅ [保护]$NC 配置文件已设置为只读，防止Cursor覆盖修改"
-                Write-Host "$BLUE💡 [提示]$NC 文件路径: $configPath"
+                Write-Host "$GREEN✅ [Bảo vệ]$NC File cấu hình đã được đặt ở chế độ chỉ đọc để tránh Cursor ghi đè"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Đường dẫn file: $configPath"
             } catch {
-                Write-Host "$YELLOW⚠️  [保护]$NC 设置只读属性失败: $($_.Exception.Message)"
-                Write-Host "$BLUE💡 [建议]$NC 可手动右键文件 → 属性 → 勾选'只读'"
+                Write-Host "$YELLOW⚠️  [Bảo vệ]$NC Thiết lập chỉ đọc thất bại: $($_.Exception.Message)"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Có thể tự chỉnh bằng cách: Chuột phải file → Properties → tick 'Read-only'"
             }
         } else {
-            Write-Host "$YELLOW⚠️  [注册表]$NC 注册表修改失败，但其他操作成功"
-
+            Write-Host "$YELLOW⚠️  [Registry]$NC Chỉnh sửa registry thất bại, nhưng các thao tác khác thành công"
+    
             if ($jsSuccess) {
-                Write-Host "$GREEN✅ [JavaScript注入]$NC JavaScript注入功能执行成功"
+                Write-Host "$GREEN✅ [Inject JavaScript]$NC Inject JavaScript thành công"
                 Write-Host ""
-                Write-Host "$YELLOW🎉 [部分完成]$NC 大部分操作完成，注册表修改失败"
-                Write-Host "$BLUE💡 [建议]$NC 可能需要管理员权限来修改注册表"
-                Write-Host "$BLUE📋 [详情]$NC 已完成以下操作："
-                Write-Host "$GREEN  ✓ 删除 Cursor 试用相关文件夹$NC"
-                Write-Host "$GREEN  ✓ Cursor 初始化清理$NC"
-                Write-Host "$GREEN  ✓ 重新生成配置文件$NC"
-                Write-Host "$GREEN  ✓ 修改机器码配置$NC"
-                Write-Host "$YELLOW  ⚠ 修改系统注册表 - 失败$NC"
-                Write-Host "$GREEN  ✓ JavaScript内核注入（设备识别绕过）$NC"
+                Write-Host "$YELLOW🎉 [Hoàn thành một phần]$NC Đa số thao tác đã hoàn tất, nhưng sửa registry thất bại"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Có thể cần quyền Administrator để sửa registry"
+                Write-Host "$BLUE📋 [Chi tiết]$NC Đã thực hiện các thao tác sau:"
+                Write-Host "$GREEN  ✓ Xóa thư mục trial Cursor$NC"
+                Write-Host "$GREEN  ✓ Dọn khởi tạo Cursor$NC"
+                Write-Host "$GREEN  ✓ Tạo lại file cấu hình$NC"
+                Write-Host "$GREEN  ✓ Sửa mã máy$NC"
+                Write-Host "$YELLOW  ⚠ Chỉnh sửa registry hệ thống - Thất bại$NC"
+                Write-Host "$GREEN  ✓ Inject JS lõi (bypass nhận diện thiết bị)$NC"
             } else {
-                Write-Host "$YELLOW⚠️  [JavaScript注入]$NC JavaScript注入功能执行失败"
+                Write-Host "$YELLOW⚠️  [Inject JavaScript]$NC Inject JavaScript thất bại"
                 Write-Host ""
-                Write-Host "$YELLOW🎉 [部分完成]$NC 大部分操作完成，注册表和JavaScript注入失败"
-                Write-Host "$BLUE💡 [建议]$NC 可能需要管理员权限来修改注册表"
+                Write-Host "$YELLOW🎉 [Hoàn thành một phần]$NC Đa số thao tác đã hoàn tất, nhưng registry và inject JS đều thất bại"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Có thể cần quyền Administrator để sửa registry"
             }
-
-            # 🔒 即使注册表修改失败，也要保护配置文件
-            Write-Host "$BLUE🔒 [保护]$NC 正在设置配置文件保护..."
+    
+            # 🔒 Dù registry thất bại vẫn bảo vệ file cấu hình
+            Write-Host "$BLUE🔒 [Bảo vệ]$NC Đang thiết lập bảo vệ file cấu hình..."
             try {
                 $configPath = $STORAGE_FILE
                 if (-not $configPath) {
-                    throw "无法解析配置文件路径"
+                    throw "Không thể phân tích đường dẫn file cấu hình"
                 }
                 $configFile = Get-Item $configPath
                 $configFile.IsReadOnly = $true
-                Write-Host "$GREEN✅ [保护]$NC 配置文件已设置为只读，防止Cursor覆盖修改"
-                Write-Host "$BLUE💡 [提示]$NC 文件路径: $configPath"
+                Write-Host "$GREEN✅ [Bảo vệ]$NC File cấu hình đã được đặt ở chế độ chỉ đọc để tránh Cursor ghi đè"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Đường dẫn file: $configPath"
             } catch {
-                Write-Host "$YELLOW⚠️  [保护]$NC 设置只读属性失败: $($_.Exception.Message)"
-                Write-Host "$BLUE💡 [建议]$NC 可手动右键文件 → 属性 → 勾选'只读'"
+                Write-Host "$YELLOW⚠️  [Bảo vệ]$NC Thiết lập chỉ đọc thất bại: $($_.Exception.Message)"
+                Write-Host "$BLUE💡 [Gợi ý]$NC Có thể tự chỉnh bằng cách: Chuột phải file → Properties → tick 'Read-only'"
             }
         }
-
+    
         Write-Host ""
-        Write-Host "$BLUE🚫 [禁用更新]$NC 正在禁用 Cursor 自动更新..."
+        Write-Host "$BLUE🚫 [Tắt cập nhật]$NC Đang vô hiệu hóa cập nhật tự động của Cursor..."
         if (Disable-CursorAutoUpdate) {
-            Write-Host "$GREEN✅ [禁用更新]$NC 自动更新已处理"
+            Write-Host "$GREEN✅ [Tắt cập nhật]$NC Đã xử lý cập nhật tự động"
         } else {
-            Write-Host "$YELLOW⚠️  [禁用更新]$NC 未能确认禁用更新，可能需要手动处理"
+            Write-Host "$YELLOW⚠️  [Tắt cập nhật]$NC Không thể xác nhận việc tắt cập nhật, có thể cần xử lý thủ công"
         }
     } else {
         Write-Host ""
-        Write-Host "$RED❌ [失败]$NC 机器码配置修改失败！"
-        Write-Host "$YELLOW💡 [建议]$NC 请检查错误信息并重试"
+        Write-Host "$RED❌ [Thất bại]$NC Sửa mã máy thất bại!"
+        Write-Host "$YELLOW💡 [Gợi ý]$NC Hãy kiểm tra lỗi rồi thử lại"
     }
 }
 
-
-# 📱 显示公众号信息
-Write-Host ""
-Write-Host "$GREEN================================$NC"
-Write-Host "$YELLOW📱  关注公众号【煎饼果子卷AI】一起交流更多Cursor技巧和AI知识(脚本免费、关注公众号加群有更多技巧和大佬)  $NC"
-Write-Host "$YELLOW⚡   [小小广告] Cursor官网正规成品号：Unlimited ♾️ ¥1050 | 7天周卡 $100 ¥210 | 7天周卡 $500 ¥1050 | 7天周卡 $1000 ¥2450 | 全部7天质保 | ，WeChat：JavaRookie666  $NC"
-Write-Host "$GREEN================================$NC"
-Write-Host ""
-
-# 🎉 脚本执行完成
-Write-Host "$GREEN🎉 [脚本完成]$NC 感谢使用 Cursor 机器码修改工具！"
-Write-Host "$BLUE💡 [提示]$NC 如有问题请参考公众号或重新运行脚本"
-Write-Host ""
-Read-Host "按回车键退出"
+Read-Host "Nhấn Enter để thoát"
 exit 0

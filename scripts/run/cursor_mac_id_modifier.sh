@@ -2836,36 +2836,36 @@ select_menu_option() {
     done
 }
 
-# 主函数
+# Hàm chính
 main() {
 
-    # 在显示菜单/流程说明前调整终端窗口大小；不支持则静默忽略
+    # Điều chỉnh kích thước cửa sổ terminal trước khi hiển thị menu; bỏ qua nếu không hỗ trợ
     try_resize_terminal_window
 
-    # 初始化日志文件
+    # Khởi tạo file log
     initialize_log
-    log_info "脚本启动..."
+    log_info "Khởi động script..."
 
-    # 🚀 启动时权限修复（解决EACCES错误）
-    log_info "🚀 [启动时权限] 执行启动时权限修复..."
+    # 🚀 Sửa quyền khi khởi động (giải quyết lỗi EACCES)
+    log_info "🚀 [Quyền khởi động] Đang thực hiện sửa quyền khi khởi động..."
     ensure_cursor_directory_permissions
 
-    # 记录系统信息
-    log_info "系统信息: $(uname -a)"
-    log_info "当前用户: $CURRENT_USER"
-    log_cmd_output "sw_vers" "macOS 版本信息"
-    log_cmd_output "which codesign" "codesign 路径"
-    # 修复：统一引号并显式转义，避免引号嵌套导致脚本解析错误
-    log_cmd_output "ls -ld \"$CURSOR_APP_PATH\"" "Cursor 应用信息"
+    # Ghi lại thông tin hệ thống
+    log_info "Thông tin hệ thống: $(uname -a)"
+    log_info "Người dùng hiện tại: $CURRENT_USER"
+    log_cmd_output "sw_vers" "Thông tin phiên bản macOS"
+    log_cmd_output "which codesign" "Đường dẫn codesign"
+    # Sửa: thống nhất dấu nháy và thoát ký tự rõ ràng, tránh lỗi phân tích script do lồng dấu nháy
+    log_cmd_output "ls -ld \"$CURSOR_APP_PATH\"" "Thông tin ứng dụng Cursor"
 
-    # 新增环境检查
+    # Kiểm tra môi trường bổ sung
     if [[ $(uname) != "Darwin" ]]; then
-        log_error "本脚本仅支持 macOS 系统"
+        log_error "Script này chỉ hỗ trợ hệ điều hành macOS"
         exit 1
     fi
 
     clear
-    # 显示 Logo
+    # Hiển thị Logo
     echo -e "
     ██████╗██╗   ██╗██████╗ ███████╗ ██████╗ ██████╗
    ██╔════╝██║   ██║██╔══██╗██╔════╝██╔═══██╗██╔══██╗
@@ -2874,276 +2874,259 @@ main() {
    ╚██████╗╚██████╔╝██║  ██║███████║╚██████╔╝██║  ██║
     ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝
     "
-    echo -e "${BLUE}================================${NC}"
-    echo -e "${GREEN}🚀   Cursor 防掉试用Pro删除工具          ${NC}"
-    echo -e "${YELLOW}📱  关注公众号【煎饼果子卷AI】     ${NC}"
-    echo -e "${YELLOW}🤝  一起交流更多Cursor技巧和AI知识(脚本免费、关注公众号加群有更多技巧和大佬)  ${NC}"
-    echo -e "${BLUE}================================${NC}"
+
+    # 🎯 Menu lựa chọn người dùng
     echo
-    echo -e "${YELLOW}⚡  [小小广告] Cursor官网正规成品号：Unlimited ♾️ ¥1050 | 7天周卡 $100 ¥210 | 7天周卡 $500 ¥1050 | 7天周卡 $1000 ¥2450 | 全部7天质保 | ，WeChat：JavaRookie666  ${NC}"
+    echo -e "${GREEN}🎯 [Chọn chế độ]${NC} Vui lòng chọn thao tác bạn muốn thực hiện:"
     echo
-    echo -e "${YELLOW}💡 [重要提示]${NC} 本工具采用分阶段执行策略，既能彻底清理又能修改机器码。"
-    echo -e "${YELLOW}💡 [重要提示]${NC} 本工具免费，如果对您有帮助，请关注公众号【煎饼果子卷AI】"
+    echo -e "${BLUE}  1️⃣  Chỉ sửa đổi mã máy${NC}"
+    echo -e "${YELLOW}      • Chỉ thực hiện chức năng sửa đổi mã máy${NC}"
+    echo -e "${YELLOW}      • Đồng thời thực hiện tiêm nhân JS${NC}"
+    echo -e "${YELLOW}      • Bỏ qua bước xóa thư mục/đặt lại môi trường${NC}"
+    echo -e "${YELLOW}      • Giữ nguyên cấu hình và dữ liệu Cursor hiện có${NC}"
     echo
+    echo -e "${BLUE}  2️⃣  Đặt lại môi trường + Sửa đổi mã máy${NC}"
+    echo -e "${RED}      • Thực hiện đặt lại môi trường hoàn toàn (xóa thư mục Cursor)${NC}"
+    echo -e "${RED}      • ⚠️  Cấu hình sẽ bị mất, hãy sao lưu trước${NC}"
+    echo -e "${YELLOW}      • Thực hiện sửa đổi mã máy${NC}"
+    echo -e "${YELLOW}      • Tương đương với hành vi script đầy đủ hiện tại${NC}"
     echo
 
-    # 🎯 用户选择菜单
-    echo
-    echo -e "${GREEN}🎯 [选择模式]${NC} 请选择您要执行的操作："
-    echo
-    echo -e "${BLUE}  1️⃣  仅修改机器码${NC}"
-    echo -e "${YELLOW}      • 仅执行机器码修改功能${NC}"
-    echo -e "${YELLOW}      • 同步执行 JS 内核注入${NC}"
-    echo -e "${YELLOW}      • 跳过文件夹删除/环境重置步骤${NC}"
-    echo -e "${YELLOW}      • 保留现有Cursor配置和数据${NC}"
-    echo
-    echo -e "${BLUE}  2️⃣  重置环境+修改机器码${NC}"
-    echo -e "${RED}      • 执行完全环境重置（删除Cursor文件夹）${NC}"
-    echo -e "${RED}      • ⚠️  配置将丢失，请注意备份${NC}"
-    echo -e "${YELLOW}      • 按照机器代码修改${NC}"
-    echo -e "${YELLOW}      • 这相当于当前的完整脚本行为${NC}"
-    echo
-
-    # 获取用户选择
+    # Nhận lựa chọn của người dùng
     while true; do
-        read -p "请输入选择 (1 或 2): " user_choice
+        read -p "Vui lòng nhập lựa chọn (1 hoặc 2): " user_choice
         if [ "$user_choice" = "1" ]; then
-            echo -e "${GREEN}✅ [选择]${NC} 您选择了：仅修改机器码"
+            echo -e "${GREEN}✅ [Đã chọn]${NC} Bạn đã chọn: Chỉ sửa đổi mã máy"
             execute_mode="MODIFY_ONLY"
             break
         elif [ "$user_choice" = "2" ]; then
-            echo -e "${GREEN}✅ [选择]${NC} 您选择了：重置环境+修改机器码"
-            echo -e "${RED}⚠️  [重要警告]${NC} 此操作将删除所有Cursor配置文件！"
-            read -p "确认执行完全重置？(输入 yes 确认，其他任意键取消): " confirm_reset
+            echo -e "${GREEN}✅ [Đã chọn]${NC} Bạn đã chọn: Đặt lại môi trường + Sửa đổi mã máy"
+            echo -e "${RED}⚠️  [Cảnh báo quan trọng]${NC} Thao tác này sẽ xóa tất cả file cấu hình Cursor!"
+            read -p "Xác nhận thực hiện đặt lại hoàn toàn? (Nhập yes để xác nhận, phím bất kỳ để hủy): " confirm_reset
             if [ "$confirm_reset" = "yes" ]; then
                 execute_mode="RESET_AND_MODIFY"
                 break
             else
-                echo -e "${YELLOW}👋 [取消]${NC} 用户取消重置操作"
+                echo -e "${YELLOW}👋 [Hủy]${NC} Người dùng đã hủy thao tác đặt lại"
                 continue
             fi
         else
-            echo -e "${RED}❌ [错误]${NC} 无效选择，请输入 1 或 2"
+            echo -e "${RED}❌ [Lỗi]${NC} Lựa chọn không hợp lệ, vui lòng nhập 1 hoặc 2"
         fi
     done
 
     echo
 
-    # 📋 根据选择显示执行流程说明
+    # 📋 Hiển thị mô tả quy trình thực thi theo lựa chọn
     if [ "$execute_mode" = "MODIFY_ONLY" ]; then
-        echo -e "${GREEN}📋 [执行流程]${NC} 仅修改机器码模式将按以下步骤执行："
-        echo -e "${BLUE}  1️⃣  检测Cursor配置文件${NC}"
-        echo -e "${BLUE}  2️⃣  备份现有配置文件${NC}"
-        echo -e "${BLUE}  3️⃣  修改机器码配置${NC}"
-        echo -e "${BLUE}  4️⃣  执行 JS 内核注入${NC}"
-        echo -e "${BLUE}  5️⃣  显示操作完成信息${NC}"
+        echo -e "${GREEN}📋 [Quy trình thực thi]${NC} Chế độ chỉ sửa đổi mã máy sẽ thực hiện theo các bước sau:"
+        echo -e "${BLUE}  1️⃣  Phát hiện file cấu hình Cursor${NC}"
+        echo -e "${BLUE}  2️⃣  Sao lưu file cấu hình hiện có${NC}"
+        echo -e "${BLUE}  3️⃣  Sửa đổi cấu hình mã máy${NC}"
+        echo -e "${BLUE}  4️⃣  Thực hiện tiêm nhân JS${NC}"
+        echo -e "${BLUE}  5️⃣  Hiển thị thông tin hoàn thành thao tác${NC}"
         echo
-        echo -e "${YELLOW}⚠️  [注意事项]${NC}"
-        echo -e "${YELLOW}  • 不会删除任何文件夹或重置环境${NC}"
-        echo -e "${YELLOW}  • 保留所有现有配置和数据${NC}"
-        echo -e "${YELLOW}  • 原配置文件会自动备份${NC}"
-        echo -e "${YELLOW}  • 需要Python3环境来处理JSON配置文件${NC}"
+        echo -e "${YELLOW}⚠️  [Lưu ý]${NC}"
+        echo -e "${YELLOW}  • Sẽ không xóa bất kỳ thư mục nào hoặc đặt lại môi trường${NC}"
+        echo -e "${YELLOW}  • Giữ nguyên tất cả cấu hình và dữ liệu hiện có${NC}"
+        echo -e "${YELLOW}  • File cấu hình gốc sẽ được tự động sao lưu${NC}"
+        echo -e "${YELLOW}  • Cần môi trường Python3 để xử lý file cấu hình JSON${NC}"
     else
-        echo -e "${GREEN}📋 [执行流程]${NC} 重置环境+修改机器码模式将按以下步骤执行："
-        echo -e "${BLUE}  1️⃣  检测并关闭Cursor进程${NC}"
-        echo -e "${BLUE}  2️⃣  保存Cursor程序路径信息${NC}"
-        echo -e "${BLUE}  3️⃣  删除指定的Cursor试用相关文件夹${NC}"
+        echo -e "${GREEN}📋 [Quy trình thực thi]${NC} Chế độ đặt lại môi trường + sửa đổi mã máy sẽ thực hiện theo các bước sau:"
+        echo -e "${BLUE}  1️⃣  Phát hiện và đóng tiến trình Cursor${NC}"
+        echo -e "${BLUE}  2️⃣  Lưu thông tin đường dẫn chương trình Cursor${NC}"
+        echo -e "${BLUE}  3️⃣  Xóa các thư mục liên quan đến thử nghiệm Cursor được chỉ định${NC}"
         echo -e "${BLUE}      📁 ~/Library/Application Support/Cursor${NC}"
         echo -e "${BLUE}      📁 ~/.cursor${NC}"
-        echo -e "${BLUE}  3.5️⃣ 预创建必要目录结构，避免权限问题${NC}"
-        echo -e "${BLUE}  4️⃣  重新启动Cursor让其生成新的配置文件${NC}"
-        echo -e "${BLUE}  5️⃣  等待配置文件生成完成（最多45秒）${NC}"
-        echo -e "${BLUE}  6️⃣  关闭Cursor进程${NC}"
-        echo -e "${BLUE}  7️⃣  修改新生成的机器码配置文件${NC}"
-        echo -e "${BLUE}  8️⃣  智能设备识别绕过（仅 JS 内核注入）${NC}"
-        echo -e "${BLUE}  9️⃣  禁用自动更新${NC}"
-        echo -e "${BLUE}  🔟  显示操作完成统计信息${NC}"
+        echo -e "${BLUE}  3.5️⃣ Tạo trước cấu trúc thư mục cần thiết, tránh lỗi quyền${NC}"
+        echo -e "${BLUE}  4️⃣  Khởi động lại Cursor để tạo file cấu hình mới${NC}"
+        echo -e "${BLUE}  5️⃣  Chờ file cấu hình được tạo xong (tối đa 45 giây)${NC}"
+        echo -e "${BLUE}  6️⃣  Đóng tiến trình Cursor${NC}"
+        echo -e "${BLUE}  7️⃣  Sửa đổi file cấu hình mã máy mới được tạo${NC}"
+        echo -e "${BLUE}  8️⃣  Vượt qua nhận dạng thiết bị thông minh (chỉ tiêm nhân JS)${NC}"
+        echo -e "${BLUE}  9️⃣  Tắt cập nhật tự động${NC}"
+        echo -e "${BLUE}  🔟  Hiển thị thông tin thống kê hoàn thành thao tác${NC}"
         echo
-        echo -e "${YELLOW}⚠️  [注意事项]${NC}"
-        echo -e "${YELLOW}  • 脚本执行过程中请勿手动操作Cursor${NC}"
-        echo -e "${YELLOW}  • 建议在执行前关闭所有Cursor窗口${NC}"
-        echo -e "${YELLOW}  • 执行完成后需要重新启动Cursor${NC}"
-        echo -e "${YELLOW}  • 原配置文件会自动备份到backups文件夹${NC}"
-        echo -e "${YELLOW}  • 需要Python3环境来处理JSON配置文件${NC}"
-        echo -e "${YELLOW}  • 已移除 MAC 地址修改，仅保留 JS 注入方案${NC}"
+        echo -e "${YELLOW}⚠️  [Lưu ý]${NC}"
+        echo -e "${YELLOW}  • Vui lòng không thao tác Cursor thủ công trong quá trình thực thi script${NC}"
+        echo -e "${YELLOW}  • Khuyến nghị đóng tất cả cửa sổ Cursor trước khi thực thi${NC}"
+        echo -e "${YELLOW}  • Cần khởi động lại Cursor sau khi thực thi xong${NC}"
+        echo -e "${YELLOW}  • File cấu hình gốc sẽ được tự động sao lưu vào thư mục backups${NC}"
+        echo -e "${YELLOW}  • Cần môi trường Python3 để xử lý file cấu hình JSON${NC}"
+        echo -e "${YELLOW}  • Đã xóa tính năng sửa đổi địa chỉ MAC, chỉ giữ lại phương án tiêm JS${NC}"
     fi
     echo
 
-    # 🤔 用户确认
-    echo -e "${GREEN}🤔 [确认]${NC} 请确认您已了解上述执行流程"
-    read -p "是否继续执行？(输入 y 或 yes 继续，其他任意键退出): " confirmation
+    # 🤔 Xác nhận của người dùng
+    echo -e "${GREEN}🤔 [Xác nhận]${NC} Vui lòng xác nhận bạn đã hiểu quy trình thực thi trên"
+    read -p "Có tiếp tục thực thi không? (Nhập y hoặc yes để tiếp tục, phím bất kỳ để thoát): " confirmation
     if [[ ! "$confirmation" =~ ^(y|yes)$ ]]; then
-        echo -e "${YELLOW}👋 [退出]${NC} 用户取消执行，脚本退出"
+        echo -e "${YELLOW}👋 [Thoát]${NC} Người dùng hủy thực thi, script thoát"
         exit 0
     fi
-    echo -e "${GREEN}✅ [确认]${NC} 用户确认继续执行"
+    echo -e "${GREEN}✅ [Xác nhận]${NC} Người dùng đã xác nhận tiếp tục thực thi"
     echo
 
-    # 🚀 根据用户选择执行相应功能
+    # 🚀 Thực thi chức năng tương ứng theo lựa chọn người dùng
     if [ "$execute_mode" = "MODIFY_ONLY" ]; then
-        log_info "🚀 [开始] 开始执行仅修改机器码功能..."
+        log_info "🚀 [Bắt đầu] Bắt đầu thực thi chức năng chỉ sửa đổi mã máy..."
 
-        # 先进行环境检查
+        # Kiểm tra môi trường trước
         if ! test_cursor_environment "MODIFY_ONLY"; then
             echo
-            log_error "❌ [环境检查失败] 无法继续执行"
+            log_error "❌ [Kiểm tra môi trường thất bại] Không thể tiếp tục thực thi"
             echo
-            log_info "💡 [建议] 请选择以下操作："
-            echo -e "${BLUE}  1️⃣  选择'重置环境+修改机器码'选项（推荐）${NC}"
-            echo -e "${BLUE}  2️⃣  手动启动Cursor一次，然后重新运行脚本${NC}"
-            echo -e "${BLUE}  3️⃣  检查Cursor是否正确安装${NC}"
-            echo -e "${BLUE}  4️⃣  安装Python3: brew install python3${NC}"
+            log_info "💡 [Gợi ý] Vui lòng chọn một trong các thao tác sau:"
+            echo -e "${BLUE}  1️⃣  Chọn tùy chọn 'Đặt lại môi trường + Sửa đổi mã máy' (khuyến nghị)${NC}"
+            echo -e "${BLUE}  2️⃣  Khởi động Cursor thủ công một lần, sau đó chạy lại script${NC}"
+            echo -e "${BLUE}  3️⃣  Kiểm tra xem Cursor đã được cài đặt đúng chưa${NC}"
+            echo -e "${BLUE}  4️⃣  Cài đặt Python3: brew install python3${NC}"
             echo
-            read -p "按回车键退出..."
+            read -p "Nhấn Enter để thoát..."
             exit 1
         fi
 
-        # 执行机器码修改
+        # Thực hiện sửa đổi mã máy
         if modify_machine_code_config "MODIFY_ONLY"; then
             echo
-            log_info "🎉 [完成] 机器码修改完成！"
-            log_info "💡 [提示] 现在可以启动Cursor使用新的机器码配置"
+            log_info "🎉 [Hoàn thành] Sửa đổi mã máy hoàn tất!"
+            log_info "💡 [Gợi ý] Bây giờ có thể khởi động Cursor để sử dụng cấu hình mã máy mới"
             echo
-            log_info "🔧 [设备识别] 正在执行 JS 内核注入..."
+            log_info "🔧 [Nhận dạng thiết bị] Đang thực hiện tiêm nhân JS..."
             if modify_cursor_js_files; then
-                log_info "✅ [设备识别] JS 内核注入完成"
+                log_info "✅ [Nhận dạng thiết bị] Tiêm nhân JS hoàn tất"
             else
-                log_warn "⚠️  [设备识别] JS 内核注入失败，请检查日志"
+                log_warn "⚠️  [Nhận dạng thiết bị] Tiêm nhân JS thất bại, vui lòng kiểm tra log"
             fi
         else
             echo
-            log_error "❌ [失败] 机器码修改失败！"
-            log_info "💡 [建议] 请尝试'重置环境+修改机器码'选项"
+            log_error "❌ [Thất bại] Sửa đổi mã máy thất bại!"
+            log_info "💡 [Gợi ý] Vui lòng thử tùy chọn 'Đặt lại môi trường + Sửa đổi mã máy'"
         fi
-        # 🚫 禁用自动更新（仅修改模式也需要）
+        # 🚫 Tắt cập nhật tự động (chế độ chỉ sửa đổi cũng cần)
         echo
-        log_info "🚫 [禁用更新] 正在禁用Cursor自动更新..."
+        log_info "🚫 [Tắt cập nhật] Đang tắt cập nhật tự động Cursor..."
         disable_auto_update
 
-        # 🛡️ 关键修复：仅修改模式的权限修复
+        # 🛡️ Sửa lỗi quan trọng: sửa quyền cho chế độ chỉ sửa đổi
         echo
-        log_info "🛡️ [权限修复] 执行仅修改模式的权限修复..."
-        log_info "💡 [说明] 确保Cursor应用能够正常启动，无权限错误"
+        log_info "🛡️ [Sửa quyền] Đang thực hiện sửa quyền cho chế độ chỉ sửa đổi..."
+        log_info "💡 [Giải thích] Đảm bảo ứng dụng Cursor có thể khởi động bình thường, không có lỗi quyền"
         ensure_cursor_directory_permissions
 
-        # 🔧 关键修复：修复应用签名问题（防止"应用已损坏"错误）
+        # 🔧 Sửa lỗi quan trọng: sửa vấn đề chữ ký ứng dụng (ngăn lỗi "ứng dụng bị hỏng")
         echo
-        log_info "🔧 [应用修复] 正在修复Cursor应用签名问题..."
-        log_info "💡 [说明] 防止出现'应用已损坏，无法打开'的错误"
+        log_info "🔧 [Sửa ứng dụng] Đang sửa vấn đề chữ ký ứng dụng Cursor..."
+        log_info "💡 [Giải thích] Ngăn xuất hiện lỗi 'Ứng dụng bị hỏng, không thể mở'"
 
         if fix_damaged_app; then
-            log_info "✅ [应用修复] Cursor应用签名修复成功"
+            log_info "✅ [Sửa ứng dụng] Sửa chữ ký ứng dụng Cursor thành công"
         else
-            log_warn "⚠️  [应用修复] 应用签名修复失败，可能需要手动处理"
-            log_info "💡 [建议] 如果Cursor无法启动，请在系统偏好设置中允许打开"
+            log_warn "⚠️  [Sửa ứng dụng] Sửa chữ ký ứng dụng thất bại, có thể cần xử lý thủ công"
+            log_info "💡 [Gợi ý] Nếu Cursor không thể khởi động, hãy cho phép mở trong Tùy chọn hệ thống"
         fi
     else
-        # 完整的重置环境+修改机器码流程
-        log_info "🚀 [开始] 开始执行重置环境+修改机器码功能..."
+        # Quy trình đầy đủ: đặt lại môi trường + sửa đổi mã máy
+        log_info "🚀 [Bắt đầu] Bắt đầu thực thi chức năng đặt lại môi trường + sửa đổi mã máy..."
 
-        # 🚀 执行主要功能
+        # 🚀 Thực thi chức năng chính
         check_permissions
         check_and_kill_cursor
 
-        # 🚨 重要警告提示
+        # 🚨 Cảnh báo quan trọng
         echo
-        echo -e "${RED}🚨 [重要警告]${NC} ============================================"
-        log_warn "⚠️  [风控提醒] Cursor 风控机制非常严格！"
-        log_warn "⚠️  [必须删除] 必须完全删除指定文件夹，不能有任何残留设置"
-        log_warn "⚠️  [防掉试用] 只有彻底清理才能有效防止掉试用Pro状态"
-        echo -e "${RED}🚨 [重要警告]${NC} ============================================"
+        echo -e "${RED}🚨 [Cảnh báo quan trọng]${NC} ============================================"
+        log_warn "⚠️  [Nhắc nhở kiểm soát rủi ro] Cơ chế kiểm soát rủi ro của Cursor rất nghiêm ngặt!"
+        log_warn "⚠️  [Bắt buộc xóa] Phải xóa hoàn toàn các thư mục được chỉ định, không được có cài đặt sót lại"
+        log_warn "⚠️  [Ngăn mất thử nghiệm] Chỉ dọn dẹp triệt để mới có thể ngăn hiệu quả việc mất trạng thái thử nghiệm Pro"
+        echo -e "${RED}🚨 [Cảnh báo quan trọng]${NC} ============================================"
         echo
 
-        # 🎯 执行 Cursor 防掉试用Pro删除文件夹功能
-        log_info "🚀 [开始] 开始执行核心功能..."
+        # 🎯 Thực thi chức năng xóa thư mục thử nghiệm Pro Cursor
+        log_info "🚀 [Bắt đầu] Bắt đầu thực thi chức năng cốt lõi..."
         remove_cursor_trial_folders
 
-        # 🔄 重启Cursor让其重新生成配置文件
+        # 🔄 Khởi động lại Cursor để tạo lại file cấu hình
         restart_cursor_and_wait
 
-        # 🛠️ 修改机器码配置
+        # 🛠️ Sửa đổi cấu hình mã máy
         modify_machine_code_config
 
-        # 🔧 智能设备识别绕过（仅 JS 内核注入）
+        # 🔧 Vượt qua nhận dạng thiết bị thông minh (chỉ tiêm nhân JS)
         echo
-        log_info "🔧 [设备识别] 开始智能设备识别绕过..."
-        log_info "💡 [说明] 已移除 MAC 地址修改，直接使用 JS 内核注入"
+        log_info "🔧 [Nhận dạng thiết bị] Bắt đầu vượt qua nhận dạng thiết bị thông minh..."
+        log_info "💡 [Giải thích] Đã xóa tính năng sửa đổi địa chỉ MAC, sử dụng trực tiếp tiêm nhân JS"
         if ! run_device_bypass; then
-            log_warn "⚠️  [设备识别] 智能设备识别绕过未完全成功，请查看日志"
+            log_warn "⚠️  [Nhận dạng thiết bị] Vượt qua nhận dạng thiết bị thông minh chưa hoàn toàn thành công, vui lòng xem log"
         fi
 
-
-        # 🔧 关键修复：修复应用签名问题（防止"应用已损坏"错误）
+        # 🔧 Sửa lỗi quan trọng: sửa vấn đề chữ ký ứng dụng (ngăn lỗi "ứng dụng bị hỏng")
         echo
-        log_info "🔧 [应用修复] 正在修复Cursor应用签名问题..."
-        log_info "💡 [说明] 防止出现'应用已损坏，无法打开'的错误"
+        log_info "🔧 [Sửa ứng dụng] Đang sửa vấn đề chữ ký ứng dụng Cursor..."
+        log_info "💡 [Giải thích] Ngăn xuất hiện lỗi 'Ứng dụng bị hỏng, không thể mở'"
 
         if fix_damaged_app; then
-            log_info "✅ [应用修复] Cursor应用签名修复成功"
+            log_info "✅ [Sửa ứng dụng] Sửa chữ ký ứng dụng Cursor thành công"
         else
-            log_warn "⚠️  [应用修复] 应用签名修复失败，可能需要手动处理"
-            log_info "💡 [建议] 如果Cursor无法启动，请在系统偏好设置中允许打开"
+            log_warn "⚠️  [Sửa ứng dụng] Sửa chữ ký ứng dụng thất bại, có thể cần xử lý thủ công"
+            log_info "💡 [Gợi ý] Nếu Cursor không thể khởi động, hãy cho phép mở trong Tùy chọn hệ thống"
         fi
     fi
 
-    # 🚫 禁用自动更新
+    # 🚫 Tắt cập nhật tự động
     echo
-    log_info "🚫 [禁用更新] 正在禁用Cursor自动更新..."
+    log_info "🚫 [Tắt cập nhật] Đang tắt cập nhật tự động Cursor..."
     disable_auto_update
 
-    # 🎉 显示操作完成信息
+    # 🎉 Hiển thị thông tin hoàn thành thao tác
     echo
-    log_info "🎉 [完成] Cursor 防掉试用Pro删除操作已完成！"
-    echo
-
-    # 📱 显示公众号信息
-    echo -e "${GREEN}================================${NC}"
-    echo -e "${YELLOW}📱  关注公众号【煎饼果子卷AI】一起交流更多Cursor技巧和AI知识(脚本免费、关注公众号加群有更多技巧和大佬)  ${NC}"
-    echo -e "${YELLOW}⚡   [小小广告] Cursor官网正规成品号：Unlimited ♾️ ¥1050 | 7天周卡 $100 ¥210 | 7天周卡 $500 ¥1050 | 7天周卡 $1000 ¥2450 | 全部7天质保 | ，WeChat：JavaRookie666  ${NC}"
-    echo -e "${GREEN}================================${NC}"
-    echo
-    log_info "🚀 [提示] 现在可以重新启动 Cursor 尝试使用了！"
+    log_info "🎉 [Hoàn thành] Thao tác xóa thử nghiệm Pro Cursor đã hoàn tất!"
     echo
 
-    # 🎉 显示修改结果总结
+    # 📱 Hiển thị thông tin tài khoản công khai
+    echo
+    log_info "🚀 [Gợi ý] Bây giờ có thể khởi động lại Cursor để thử sử dụng!"
+    echo
+
+    # 🎉 Hiển thị tóm tắt kết quả sửa đổi
     echo
     echo -e "${GREEN}================================${NC}"
-    echo -e "${BLUE}   🎯 修改结果总结     ${NC}"
+    echo -e "${BLUE}   🎯 Tóm tắt kết quả sửa đổi     ${NC}"
     echo -e "${GREEN}================================${NC}"
-    echo -e "${GREEN}✅ JSON配置文件修改: 完成${NC}"
-    echo -e "${GREEN}✅ 自动更新禁用: 完成${NC}"
+    echo -e "${GREEN}✅ Sửa đổi file cấu hình JSON: Hoàn thành${NC}"
+    echo -e "${GREEN}✅ Tắt cập nhật tự động: Hoàn thành${NC}"
     echo -e "${GREEN}================================${NC}"
     echo
 
-    # 🛡️ 脚本完成前最终权限修复
+    # 🛡️ Sửa quyền cuối cùng trước khi script hoàn thành
     echo
-    log_info "🛡️ [最终权限修复] 执行脚本完成前的最终权限修复..."
+    log_info "🛡️ [Sửa quyền cuối cùng] Thực hiện sửa quyền cuối cùng trước khi script hoàn thành..."
     ensure_cursor_directory_permissions
     protect_storage_file
 
-    # 🎉 脚本执行完成
-    log_info "🎉 [完成] 所有操作已完成！"
+    # 🎉 Script thực thi hoàn tất
+    log_info "🎉 [Hoàn thành] Tất cả các thao tác đã hoàn tất!"
     echo
-    log_info "💡 [重要提示] 完整的Cursor破解流程已执行："
-    echo -e "${BLUE}  ✅ 机器码配置文件修改${NC}"
-    echo -e "${BLUE}  ✅ 自动更新功能禁用${NC}"
-    echo -e "${BLUE}  ✅ 权限修复和验证${NC}"
+    log_info "💡 [Lưu ý quan trọng] Đã thực hiện quy trình đầy đủ:"
+    echo -e "${BLUE}  ✅ Sửa đổi file cấu hình mã máy${NC}"
+    echo -e "${BLUE}  ✅ Tắt chức năng cập nhật tự động${NC}"
+    echo -e "${BLUE}  ✅ Sửa quyền và xác minh${NC}"
     echo
-    log_warn "⚠️  [注意] 重启 Cursor 后生效"
+    log_warn "⚠️  [Lưu ý] Có hiệu lực sau khi khởi động lại Cursor"
     echo
-    log_info "🚀 [下一步] 现在可以启动 Cursor 尝试使用了！"
+    log_info "🚀 [Bước tiếp theo] Bây giờ có thể khởi động Cursor để thử sử dụng!"
     echo
 
-    # 记录脚本完成信息
-    log_info "📝 [日志] 脚本执行完成"
-    echo "========== Cursor 防掉试用Pro删除工具日志结束 $(date) ==========" >> "$LOG_FILE"
+    # Ghi lại thông tin hoàn thành script
+    log_info "📝 [Log] Script thực thi hoàn tất"
+    echo "========== Kết thúc log Công cụ xóa thử nghiệm Pro Cursor $(date) ==========" >> "$LOG_FILE"
 
-    # 显示日志文件位置
+    # Hiển thị vị trí file log
     echo
-    log_info "📄 [日志] 详细日志已保存到: $LOG_FILE"
-    echo "如遇问题请将此日志文件提供给开发者以协助排查"
+    log_info "📄 [Log] Log chi tiết đã được lưu tại: $LOG_FILE"
+    echo "Nếu gặp vấn đề, vui lòng cung cấp file log này cho nhà phát triển để hỗ trợ xử lý"
     echo
 }
 
-# 执行主函数
+# Thực thi hàm chính
 main
